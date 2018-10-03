@@ -6,6 +6,15 @@ import tensorflow as tf
 from tensorflow.python.keras.preprocessing import image as kp_image
 
 def load_img(path_to_img):
+    '''
+    Loads an image file into an array.
+
+    Keyword Arguments:
+    path_to_img - Path to the image we wish to load
+
+    Returns:
+    A numpy array containing our image information.
+    '''
     max_dim = 512
     img = Image.open(path_to_img)
     long = max(img.size)
@@ -19,6 +28,13 @@ def load_img(path_to_img):
     return img
 
 def imshow(img, title=None):
+    '''
+    Shows a desired image in matplotlib.
+
+    Keyword Argments:
+    img   - A numpy array containing our image.
+    title - The desired title of graph.
+    '''
     # Remove the batch dimension
     out = np.squeeze(img, axis=0)
     # Normalize for display 
@@ -29,11 +45,23 @@ def imshow(img, title=None):
     plt.imshow(out)
 
 def load_and_process_img(path_to_img):
+    '''
+    Loads an image into memory, and preprocesses in Keras.
+
+    Keyword Arguments:
+    path_to_img - File location of desired image.
+
+    Returns:
+    Processed image.
+    '''
     img = load_img(path_to_img)
     img = tf.keras.applications.vgg19.preprocess_input(img)
     return img
 
 def deprocess_img(processed_img):
+    '''
+    Reverses the steps of a processed image in Keras.
+    '''
     x = processed_img.copy()
     if len(x.shape) == 4:
         x = np.squeeze(x, 0)

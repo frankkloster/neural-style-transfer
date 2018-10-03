@@ -17,7 +17,8 @@ num_content_layers = len(content_layers)
 num_style_layers = len(style_layers)
 
 def get_model():
-    """ Creates our model with access to intermediate layers. 
+    """
+    Creates our model with access to intermediate layers. 
 
     This function will load the VGG19 model and access the intermediate layers. 
     These layers will then be used to create a new model that will take input image
@@ -27,13 +28,16 @@ def get_model():
     returns a keras model that takes image inputs and outputs the style and 
         content intermediate layers. 
     """
+    
     # Load our model. We load pretrained VGG, trained on imagenet data
     vgg = tf.keras.applications.vgg19.VGG19(include_top=False, weights='imagenet')
     vgg.trainable = False
+    
     # Get output layers corresponding to style and content layers 
     style_outputs = [vgg.get_layer(name).output for name in style_layers]
     content_outputs = [vgg.get_layer(name).output for name in content_layers]
     model_outputs = style_outputs + content_outputs
+    
     # Build model 
     return models.Model(vgg.input, model_outputs)
 
@@ -50,6 +54,7 @@ def gram_matrix(input_tensor):
 
 def get_style_loss(base_style, gram_target):
     """Expects two images of dimension h, w, c"""
+    
     # height, width, num filters of each layer
     # We scale the loss at a given layer by the size of the feature map and the number of filters
     height, width, channels = base_style.get_shape().as_list()
@@ -72,6 +77,7 @@ def get_feature_representations(model, content_path, style_path):
     Returns:
     returns the style features and the content features. 
     """
+    
     # Load our images in 
     content_image = load_and_process_img(content_path)
     style_image = load_and_process_img(style_path)
@@ -80,13 +86,12 @@ def get_feature_representations(model, content_path, style_path):
     style_outputs = model(style_image)
     content_outputs = model(content_image)
 
-
     # Get the style and content feature representations from our model  
     style_features = [style_layer[0] for style_layer in style_outputs[:num_style_layers]]
     content_features = [content_layer[0] for content_layer in content_outputs[num_style_layers:]]
     return style_features, content_features
 
-def compute_loss(model, loss_weights, init_image, gram_style_features, content_features, alpha=1, beta=1):
+def compute_loss(model, loss_weights, init_image, gram_style_features, content_features):
     """This function will compute the loss total loss.
 
     Arguments:
@@ -132,7 +137,7 @@ def compute_loss(model, loss_weights, init_image, gram_style_features, content_f
     content_score *= content_weight
 
     # Get total loss
-    loss = alpha * style_score + beta * content_score 
+    loss = style_score + content_score 
     return loss, style_score, content_score
 
 def compute_grads(cfg):

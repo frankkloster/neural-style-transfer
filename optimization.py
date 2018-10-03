@@ -11,9 +11,6 @@ from PIL import Image
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
 
-import logging
-logging.basicConfig(level=logging.DEBUG)
-
 tf.enable_eager_execution()
 print("Eager execution: {}".format(tf.executing_eagerly()))
 
@@ -22,6 +19,21 @@ def run_style_transfer(content_path,
                        num_iterations=1000,
                        content_weight=1e3, 
                        style_weight=1e-2): 
+    '''
+    Given a style and content image, optimizes the our loss function for a neural style transfer, and 
+    returns the given image, as well as loss.
+
+    Keyword Arguments:
+    content_path   - Path to the content image.
+    style_path     - Path to the style image.
+    content_weight - How much weight is placed on the content portion of our loss.
+    style_weights  - How much weight is placed on the style portion of our loss.
+    
+    Returns:
+    best_img - A numpy array containing the image that optimizes our loss function.
+    best_loss - The loss that the image gives.
+    '''
+    
     # We don't need to (or want to) train any layers of our model, so we set their
     # trainable to false. 
     model = get_model() 
@@ -35,6 +47,7 @@ def run_style_transfer(content_path,
     # Set initial image
     init_image = load_and_process_img(content_path)
     init_image = tfe.Variable(init_image, dtype=tf.float32)
+    
     # Create our optimizer
     opt = tf.train.AdamOptimizer(learning_rate=5, beta1=0.99, epsilon=1e-1)
 
@@ -72,10 +85,7 @@ def run_style_transfer(content_path,
         opt.apply_gradients([(grads, init_image)])
         clipped = tf.clip_by_value(init_image, min_vals, max_vals)
         init_image.assign(clipped)
-        end_time = time.time() 
-
-        # logging.debug(loss)
-        # logging.debug(best_loss)
+        end_time = time.time()
 
         if loss < best_loss:
             # Update best loss and best image from total loss. 
