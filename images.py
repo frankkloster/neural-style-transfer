@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib as mpl
+mpl.use('TkAgg')  # or whatever other backend that you want
 import matplotlib.pyplot as plt
 from PIL import Image
 

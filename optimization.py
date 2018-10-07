@@ -6,6 +6,8 @@ from model import get_model, get_feature_representations, gram_matrix, compute_g
 import IPython.display
 
 import numpy as np
+import matplotlib as mpl
+mpl.use('TkAgg')  # or whatever other backend that you want
 import matplotlib.pyplot as plt
 from PIL import Image
 import tensorflow as tf
