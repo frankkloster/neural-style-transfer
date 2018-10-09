@@ -80,3 +80,6 @@ def deprocess_img(processed_img):
 
     x = np.clip(x, 0, 255).astype('uint8')
     return x
+
+def imsave(img, path):
+    img.save(path)
